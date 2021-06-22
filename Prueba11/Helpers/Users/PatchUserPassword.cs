@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Prueba11.Helpers
 {
-    public class GetSessions
+    public class PatchUserPassword
     {
-        public string sessionId {get; set;}
+        public string oldPassword {get; set;}
+        public string newPassword {get; set;}
     }
 }

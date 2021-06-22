@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Prueba11.Helpers
 {
-    public class PostCreateUser
+    public class PostCreateItem
     {
         public string title {get; set;}
         public string image {get; set;}
@@ -16,8 +16,8 @@ namespace Prueba11.Helpers
         public string summary {get; set;}
         public string director {get; set;}
         public string productor {get; set;}
-        public string[] writers {get; set;}
-        public string[] stars {get; set;}
+        public string writers {get; set;}
+        public string stars {get; set;}
         public string productorCountry {get; set;}
         public string language {get; set;}
         public string releaseDate {get; set;}

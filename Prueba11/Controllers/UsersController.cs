@@ -27,6 +27,13 @@ namespace Prueba11.Controllers
             return Json("probando json");
         }
 
+        [HttpPost]
+        [Route("users/administrator")]
+        public ActionResult PostCreateAdministrator([FromBody] PostCreateAdministrator input) {
+
+            return Json("probando json");
+        }
+
         [HttpDelete]
         [Route("users/{email}")]
         public ActionResult DeleteUser(string email) {
@@ -34,9 +41,9 @@ namespace Prueba11.Controllers
             return Json("probando json");
         }
 
-        [HttpPut]
-        [Route("users/{email}")]
-        public ActionResult PutEditUser([FromBody] PutEditUser input, string email) {
+        [HttpPatch]
+        [Route("users/password")]
+        public ActionResult PatchUserPassword([FromBody] PatchUserPassword input) {
 
             return Json("probando json");
         }
@@ -71,7 +78,7 @@ namespace Prueba11.Controllers
 
         [HttpPost]
         [Route("logout")]
-        public ActionResult PostLogout([FromBody] PostLogout input, string email) {
+        public ActionResult PostLogout() {
 
             return Json("probando json");
         }

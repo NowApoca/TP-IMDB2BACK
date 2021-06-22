@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Prueba11.Helpers
 {
-    public class GetSessions
+    public class PatchEditItemTitle
     {
-        public string sessionId {get; set;}
+        public string newTitle {get; set;}
     }
 }

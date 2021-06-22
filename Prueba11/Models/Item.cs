@@ -9,12 +9,24 @@ namespace Prueba11.Models
 {
     public class Item
     {
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int id {get; set; }
         public string title { get; set; }
-        public string image { get; set; }
-        public double userRating { get; set; }
+        public string image {get; set;}
+        public string subtitle {get; set;}
+        public int year {get; set; }
         public double rating { get; set; }
-        public bool isBookmarked { get; set; }
+        public string summary {get; set;}
+        public string director {get; set;}
+        public string productor {get; set;}
+        public string writers {get; set;}
+        public string stars {get; set;}
+        public string productorCountry {get; set;}
+        public string language {get; set;}
+        public string releaseDate {get; set;}
+        public int duration {get; set;}
+        public string genre {get; set;}
+        public string budget {get; set;}
+        public string earns {get; set;}
     }
 }

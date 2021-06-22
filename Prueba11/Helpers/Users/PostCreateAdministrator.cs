@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace Prueba11.Helpers
 {
-    public class GetSessions
+    public class PostCreateAdministrator
     {
-        public string sessionId {get; set;}
+        public string username {get; set;}
+        public string password {get; set;}
+        public string role {get; set;}
     }
 }

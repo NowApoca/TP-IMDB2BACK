@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,79 +23,366 @@ namespace Prueba11.Controllers
 
         [HttpPost]
         [Route("celebrities")]
-        public ActionResult CreateCelebrity([FromBody] PostCreateCelebrity input) {
-
-            return Json("probando json");
+        public async Task<IActionResult> CreateCelebrity([FromBody] PostCreateCelebrity input)
+        {
+            int status;
+            string error = null;
+            var celebrity = new Celebrity()
+            {
+                name = input.name,
+                image = input.image,
+                surname = input.surname,
+                country = input.country,
+                language = input.language,
+                biography = input.biography,
+                bornDate = input.bornDate,
+                genres = input.genres
+            };
+            try
+            {
+                _context.Celebrities.Add(celebrity);
+                await _context.SaveChangesAsync();
+                status = HttpConstants.RESOURCE_CREATED;
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e.Message);
+                status = 500;
+                error = "ERROR INTERNO. VERIFIQUE LOGS.";
+            }
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
         [HttpDelete]
-        [Route("celebrities/{title}")]
-        public ActionResult DeleteCelebrity(string title) {
-
-            return Json("probando json");
+        [Route("celebrities/{id}")]
+        public ActionResult DeleteCelebrity(string id) {
+            int status;
+            string error = null;
+            bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
+            if (exists)
+            {
+                try
+                {
+                    Celebrity celebrity = new Celebrity { id = id };
+                    _context.Celebrities.Attach(celebrity);
+                    _context.Celebrities.Remove(celebrity);
+                    _context.SaveChanges();
+                    status = HttpConstants.SUCCESS_NO_DATA;
+                }
+                catch(IOException e)
+                {
+                    Console.WriteLine(e.Message);
+                    status = 500;
+                    error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
         [HttpPut]
-        [Route("celebrities/{title}")]
-        public ActionResult EditCelebrities([FromBody] PutEditCelebrity input, string title) {
-
-            return Json("probando json");
-        }
-
-        [HttpPatch]
-        [Route("celebrities/{title}")]
-        public ActionResult PatchCelebrityTitle([FromBody] PatchCelebrityTitle input, string title) {
-
-            return Json("probando json");
+        [Route("celebrities/{id}")]
+        public async Task<IActionResult> PutEditCelebrity([FromBody] PutEditCelebrity input, string id)
+        { 
+            int status;
+            string error = null;
+            bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
+            if (exists)
+            {
+                var celebrity = new Celebrity()
+                {
+                    id = id,
+                    name = input.name,
+                    image = input.image,
+                    surname = input.surname,
+                    country = input.country,
+                    language = input.language,
+                    biography = input.biography,
+                    bornDate = input.bornDate,
+                    genres = input.genres
+                };
+                try
+                {
+                    _context.Celebrities.Update(celebrity);
+                    await _context.SaveChangesAsync();
+                    status = HttpConstants.SUCCESS_NO_DATA;
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine(e.Message);
+                    status = 500;
+                    error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
         [HttpGet]
         [Route("celebrities")]
-        public ActionResult GetCelebrities([FromBody] GetFilters filters) {
-
-            return Json("probando json");
+        public ActionResult GetCelebrities([FromQuery] GetFilters filters)
+        {
+            int limit = filters.limit;
+            int offset = filters.offset;
+            string orderBy = filters.orderBy;
+            Celebrity[] celebrities;
+            switch (orderBy)
+            {
+                case "title":
+                    celebrities = _context.Celebrities.Take(limit).Skip(offset).OrderBy(celebrity => celebrity.surname).ToArray();
+                    break;
+                case "rating":
+                    celebrities = _context.Celebrities.Take(limit).Skip(offset).OrderBy(celebrity => celebrity.rating).ToArray();
+                    break;
+                default:
+                    celebrities = _context.Celebrities.Take(limit).Skip(offset).OrderBy(celebrity => celebrity.surname).ToArray();
+                    break;
+            }
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("status", HttpConstants.SUCCESS_DATA);
+            data.Add("error", null);
+            data.Add("data", celebrities);
+            return Json(data);
         }
 
         [HttpGet]
-        [Route("celebrities/top/{topType}")]
-        public ActionResult GetTopItems([FromBody] GetFilters filters, string topType) {
-
-            return Json("probando json");
-        }
-
-        [HttpGet]
-        [Route("item/{title}")]
-        public ActionResult GetItem(string title) {
-
-            return Json("probando json");
+        [Route("celebrities/{id}")]
+        public ActionResult GetCelebrity(string id)
+        {
+            int status;
+            string error = null;
+            bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                try
+                {
+                    Celebrity celebrity = _context.Celebrities.Where(celebrity => celebrity.id == id).FirstOrDefault();
+                    data.Add("data", celebrity);
+                    status = HttpConstants.SUCCESS_DATA;
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine(e.Message);
+                    status = 500;
+                    error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
         [HttpPost]
-        [Route("celebrities/link/celebrities/{title}")]
-        public ActionResult LinkCelebritiesToCelebrity([FromBody] LinkCelebritiesToCelebrity input, string title) {
+        [Route("celebrities/link/celebrities/{id}")]
+        public async Task<IActionResult> LinkCelebritiesToCelebrity([FromBody] LinkCelebritiesToCelebrity input, string id){
+            int status = 500;
+            string error = null;
+            bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                foreach (String idCelebrity in input.celebrityIds)
+                {
+                    bool existsLink = _context.LinkedCelebrityWithCelebrities.Any(celebrityLink => 
+                    (celebrityLink.celebrityId1 == idCelebrity || celebrityLink.celebrityId2 == idCelebrity) &&
+                    (celebrityLink.celebrityId1 == id || celebrityLink.celebrityId2 == id)
+                    );
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (!existsLink)
+                    {
+                        try
+                        {
 
-            return Json("probando json");
+                            var celebrity = new LinkedCelebrityWithCelebrity()
+                            {
+                                celebrityId1 = id,
+                                celebrityId2 = idCelebrity
+                            };
+                            _context.LinkedCelebrityWithCelebrities.Add(celebrity);
+                            await _context.SaveChangesAsync();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
         [HttpPost]
-        [Route("celebrities/link/items/{title}")]
-        public ActionResult LinkItemsToCelebrity([FromBody] LinkItemsToCelebrity input, string title) {
+        [Route("celebrities/link/items/{id}")]
+        public async Task<IActionResult> LinkItemsToCelebrity([FromBody] LinkItemsToCelebrity input, string id)
+        {
+            int status = 500;
+            string error = null;
+            bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                foreach (String idItem in input.itemIds)
+                {
+                    bool existsLink = _context.LinkedItemWithCelebrities.Any(celebrityLink =>
+                        celebrityLink.itemId== idItem  && celebrityLink.celebrityId == id
+                    );
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (!existsLink)
+                    {
+                        try
+                        {
 
-            return Json("probando json");
+                            var celebrity = new LinkedItemWithCelebrity()
+                            {
+                                celebrityId = id,
+                                itemId = idItem
+                            };
+                            _context.LinkedItemWithCelebrities.Add(celebrity);
+                            await _context.SaveChangesAsync();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
         [HttpPost]
-        [Route("celebrities/unlink/celebrity/{title}")]
-        public ActionResult UnlinkCelebrityFromCelebrity([FromBody] UnlinkCelebrityFromCelebrity input, string title) {
+        [Route("celebrities/unlink/celebrity/{id}")]
+        public ActionResult UnlinkCelebrityFromCelebrity([FromBody] UnlinkCelebrityFromCelebrity input, string id)
+        {
+            int status = 500;
+            string error = null;
+            bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                foreach (String idCelebrity in input.celebrityIds)
+                {
 
-            return Json("probando json");
+                    LinkedCelebrityWithCelebrity linkedCelebrityWithCelebrity = _context.LinkedCelebrityWithCelebrities.Where(celebrityLink =>
+                        (celebrityLink.celebrityId1 == idCelebrity || celebrityLink.celebrityId2 == idCelebrity) &&
+                        (celebrityLink.celebrityId1 == id || celebrityLink.celebrityId2 == id)
+                    ).FirstOrDefault();
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (linkedCelebrityWithCelebrity != null)
+                    {
+                        try
+                        {
+                            _context.LinkedCelebrityWithCelebrities.Attach(linkedCelebrityWithCelebrity);
+                            _context.LinkedCelebrityWithCelebrities.Remove(linkedCelebrityWithCelebrity);
+                            _context.SaveChanges();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
         [HttpPost]
-        [Route("celebrities/unlink/item/{title}")]
-        public ActionResult UnlinkItemFromCelebrity([FromBody] UnlinkItemFromCelebrity input, string title) {
+        [Route("celebrities/unlink/item/{id}")]
+        public ActionResult UnlinkItemFromCelebrity([FromBody] UnlinkItemFromCelebrity input, string id)
+        {
+            int status = 500;
+            string error = null;
+            bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                foreach (String idItem in input.itemIds)
+                {
+                    bool existsLink = _context.LinkedItemWithCelebrities.Any(celebrityLink =>
+                        celebrityLink.itemId == idItem && celebrityLink.celebrityId == id
+                    );
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (existsLink)
+                    {
+                        try
+                        {
 
-            return Json("probando json");
+                            var celebrityLinkedWithItem = new LinkedItemWithCelebrity()
+                            {
+                                celebrityId = id,
+                                itemId = idItem
+                            };
+                            _context.LinkedItemWithCelebrities.Attach(celebrityLinkedWithItem);
+                            _context.LinkedItemWithCelebrities.Remove(celebrityLinkedWithItem);
+                            _context.SaveChanges();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
     }
 }

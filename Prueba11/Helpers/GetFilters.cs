@@ -11,7 +11,6 @@ namespace Prueba11.Helpers
     {
         public int limit {get; set;}
         public int offset {get; set;}
-        public string name {get; set;}
         public string orderBy {get; set;}
     }
 }

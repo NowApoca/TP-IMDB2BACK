@@ -29,7 +29,7 @@ namespace Prueba11.Controllers
 
         [HttpDelete]
         [Route("comments/{id}")]
-        public ActionResult DeleteDeleteComment([FromBody] DeleteDeleteComment input, string id) {
+        public ActionResult DeleteDeleteComment(string id) {
 
             return Json("probando json");
         }

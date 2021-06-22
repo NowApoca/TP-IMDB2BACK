@@ -5,10 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Prueba11.Helpers
+namespace Prueba11.Models
 {
-    public class PatchEditUser
+    public class LinkedCelebrityWithCelebrity
     {
-        public string newTitle {get; set;}
+        public string celebrityId1 { get; set; }
+        public string celebrityId2 { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace Prueba11.Controllers
         }
 
         [HttpPost]
-        [Route("users")]
+        [Route("ratings")]
         public ActionResult PostCreateRating([FromBody] PostCreateRating input) {
 
             return Json("probando json");
@@ -35,7 +35,7 @@ namespace Prueba11.Controllers
         }
 
         [HttpPatch]
-        [Route("users/{id}")]
+        [Route("rating/{id}")]
         public ActionResult PatchEditRating([FromBody] PatchEditRating input) {
 
             return Json("probando json");

@@ -5,10 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Prueba11.Helpers
+namespace Prueba11.Models
 {
-    public class GetSessions
+    public class User
     {
-        public string sessionId {get; set;}
+        [Key]
+        public string userName {get; set;}
+        public string password {get; set;}
+        public string role {get; set;}
     }
 }

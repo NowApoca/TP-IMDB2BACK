@@ -5,11 +5,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Prueba11.Helpers
+namespace Prueba11.Models
 {
-    public class PutEditCelebrity
+    public class Celebrity
     {
-        public string name {get; set;}
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string id {get; set;}
+        public string name {get; set; }
+        public int rating{ get; set; }
         public string image {get; set;}
         public string surname {get; set;}
         public string country {get; set;}

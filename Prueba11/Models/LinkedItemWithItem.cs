@@ -5,10 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Prueba11.Helpers
+namespace Prueba11.Models
 {
-    public class GetSessions
+    public class LinkedItemWithItem
     {
-        public string sessionId {get; set;}
+        public string itemId1 { get; set; }
+        public string itemId2 { get; set; }
     }
 }
