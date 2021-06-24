@@ -10,7 +10,7 @@ namespace Prueba11.Models
     public class RatingCelebrity
     {
         public string userName { get; set; }
-        public string celebrityId { get; set; }
+        public int celebrityId { get; set; }
         public int rating {get; set;}
     }
 }

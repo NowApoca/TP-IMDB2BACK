@@ -9,6 +9,6 @@ namespace Prueba11.Helpers
 {
     public class AddReactToComment
     {
-        public string reactionId {get; set;}
+        public string reactionType {get; set; }
     }
 }

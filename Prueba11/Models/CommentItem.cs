@@ -11,10 +11,10 @@ namespace Prueba11.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string id {get; set; }
+        public int id {get; set; }
         public CommentItem ParentCommentItem{ get; set; }
         public Item Item { get; set; }
-        public User User { get; set; }
+        public string userName { get; set; }
         public string comment {get; set;}
         public bool isDeleted {get; set;}
     }

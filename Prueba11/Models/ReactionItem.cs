@@ -11,9 +11,9 @@ namespace Prueba11.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string id { get; set; }
-        public CommentItem CommentItem { get; set; }
+        public int id { get; set; }
+        public int commentItemId { get; set; }
         public string reactionType { get; set; }
-        public User User {get; set;}
+        public string userName {get; set;}
     }
 }

@@ -9,6 +9,6 @@ namespace Prueba11.Helpers
 {
     public class LinkCelebritiesToItem
     {
-        public string[] celebrityIds {get; set;}
+        public int[] celebrityIds {get; set;}
     }
 }

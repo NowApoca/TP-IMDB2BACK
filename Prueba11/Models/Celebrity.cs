@@ -9,9 +9,8 @@ namespace Prueba11.Models
 {
     public class Celebrity
     {
-        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string id {get; set;}
+        public int id {get; set;}
         public string name {get; set; }
         public int rating{ get; set; }
         public string image {get; set;}

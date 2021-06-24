@@ -27,7 +27,7 @@ namespace Prueba11.Controllers
         {
             int status;
             string error = null;
-            var celebrity = new Celebrity()
+            Celebrity celebrity = new Celebrity()
             {
                 name = input.name,
                 image = input.image,
@@ -58,7 +58,7 @@ namespace Prueba11.Controllers
 
         [HttpDelete]
         [Route("celebrities/{id}")]
-        public ActionResult DeleteCelebrity(string id) {
+        public ActionResult DeleteCelebrity(int id) {
             int status;
             string error = null;
             bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
@@ -92,7 +92,7 @@ namespace Prueba11.Controllers
 
         [HttpPut]
         [Route("celebrities/{id}")]
-        public async Task<IActionResult> PutEditCelebrity([FromBody] PutEditCelebrity input, string id)
+        public async Task<IActionResult> PutEditCelebrity([FromBody] PutEditCelebrity input, int id)
         { 
             int status;
             string error = null;
@@ -164,7 +164,7 @@ namespace Prueba11.Controllers
 
         [HttpGet]
         [Route("celebrities/{id}")]
-        public ActionResult GetCelebrity(string id)
+        public ActionResult GetCelebrity(int id)
         {
             int status;
             string error = null;
@@ -197,14 +197,14 @@ namespace Prueba11.Controllers
 
         [HttpPost]
         [Route("celebrities/link/celebrities/{id}")]
-        public async Task<IActionResult> LinkCelebritiesToCelebrity([FromBody] LinkCelebritiesToCelebrity input, string id){
+        public async Task<IActionResult> LinkCelebritiesToCelebrity([FromBody] LinkCelebritiesToCelebrity input, int id){
             int status = 500;
             string error = null;
             bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
             IDictionary<string, object> data = new Dictionary<string, object>();
             if (exists)
             {
-                foreach (String idCelebrity in input.celebrityIds)
+                foreach (int idCelebrity in input.celebrityIds)
                 {
                     bool existsLink = _context.LinkedCelebrityWithCelebrities.Any(celebrityLink => 
                     (celebrityLink.celebrityId1 == idCelebrity || celebrityLink.celebrityId2 == idCelebrity) &&
@@ -245,7 +245,7 @@ namespace Prueba11.Controllers
 
         [HttpPost]
         [Route("celebrities/link/items/{id}")]
-        public async Task<IActionResult> LinkItemsToCelebrity([FromBody] LinkItemsToCelebrity input, string id)
+        public async Task<IActionResult> LinkItemsToCelebrity([FromBody] LinkItemsToCelebrity input, int id)
         {
             int status = 500;
             string error = null;
@@ -253,7 +253,7 @@ namespace Prueba11.Controllers
             IDictionary<string, object> data = new Dictionary<string, object>();
             if (exists)
             {
-                foreach (String idItem in input.itemIds)
+                foreach (int idItem in input.itemIds)
                 {
                     bool existsLink = _context.LinkedItemWithCelebrities.Any(celebrityLink =>
                         celebrityLink.itemId== idItem  && celebrityLink.celebrityId == id
@@ -293,7 +293,7 @@ namespace Prueba11.Controllers
 
         [HttpPost]
         [Route("celebrities/unlink/celebrity/{id}")]
-        public ActionResult UnlinkCelebrityFromCelebrity([FromBody] UnlinkCelebrityFromCelebrity input, string id)
+        public ActionResult UnlinkCelebrityFromCelebrity([FromBody] UnlinkCelebrityFromCelebrity input, int id)
         {
             int status = 500;
             string error = null;
@@ -301,7 +301,7 @@ namespace Prueba11.Controllers
             IDictionary<string, object> data = new Dictionary<string, object>();
             if (exists)
             {
-                foreach (String idCelebrity in input.celebrityIds)
+                foreach (int idCelebrity in input.celebrityIds)
                 {
 
                     LinkedCelebrityWithCelebrity linkedCelebrityWithCelebrity = _context.LinkedCelebrityWithCelebrities.Where(celebrityLink =>
@@ -338,7 +338,7 @@ namespace Prueba11.Controllers
 
         [HttpPost]
         [Route("celebrities/unlink/item/{id}")]
-        public ActionResult UnlinkItemFromCelebrity([FromBody] UnlinkItemFromCelebrity input, string id)
+        public ActionResult UnlinkItemFromCelebrity([FromBody] UnlinkItemFromCelebrity input, int id)
         {
             int status = 500;
             string error = null;
@@ -346,7 +346,7 @@ namespace Prueba11.Controllers
             IDictionary<string, object> data = new Dictionary<string, object>();
             if (exists)
             {
-                foreach (String idItem in input.itemIds)
+                foreach (int idItem in input.itemIds)
                 {
                     bool existsLink = _context.LinkedItemWithCelebrities.Any(celebrityLink =>
                         celebrityLink.itemId == idItem && celebrityLink.celebrityId == id

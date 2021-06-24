@@ -9,7 +9,7 @@ namespace Prueba11.Helpers
 {
     public class PostCreateRating
     {
-        public string entityId {get; set;}
+        public int entityId {get; set;}
         public string type {get; set;}
         public int rating {get; set;}
     }

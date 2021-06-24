@@ -9,6 +9,6 @@ namespace Prueba11.Helpers
 {
     public class UnlinkItemFromItem
     {
-        public string itemId {get; set;}
+        public int[] itemIds {get; set;}
     }
 }

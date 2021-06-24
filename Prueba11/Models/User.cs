@@ -11,7 +11,8 @@ namespace Prueba11.Models
     {
         [Key]
         public string userName {get; set;}
-        public string password {get; set;}
+        public string password {get; set; }
+        public bool isDeleted { get; set; }
         public string role {get; set;}
     }
 }

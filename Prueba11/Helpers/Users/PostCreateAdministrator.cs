@@ -9,7 +9,7 @@ namespace Prueba11.Helpers
 {
     public class PostCreateAdministrator
     {
-        public string username {get; set;}
+        public string userName {get; set;}
         public string password {get; set;}
         public string role {get; set;}
     }

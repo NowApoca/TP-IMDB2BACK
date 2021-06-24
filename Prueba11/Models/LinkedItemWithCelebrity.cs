@@ -9,7 +9,7 @@ namespace Prueba11.Models
 {
     public class LinkedItemWithCelebrity
     {
-        public string itemId { get; set; }
-        public string celebrityId { get; set; }
+        public int itemId { get; set; }
+        public int celebrityId { get; set; }
     }
 }

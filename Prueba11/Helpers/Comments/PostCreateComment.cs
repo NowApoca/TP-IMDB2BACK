@@ -10,7 +10,8 @@ namespace Prueba11.Helpers
     public class PostCreateComment
     {
         public string comment {get; set;}
-        public int type {get; set;}
-        public string entityId {get; set;}
+        public string type {get; set;}
+        public int entityId {get; set;}
+        public int parentCommentId { get; set; }
     }
 }

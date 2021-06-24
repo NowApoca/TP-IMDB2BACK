@@ -97,17 +97,17 @@ namespace Prueba11.Controllers
         }
 
         [HttpDelete]
-        [Route("items/{title?}")]
-        public ActionResult DeleteItem(string title, [FromHeader] HeadersHelper headers)
+        [Route("items/{id?}")]
+        public ActionResult DeleteItem(int id, [FromHeader] HeadersHelper headers)
         {
             int status;
             string error = null;
-            bool exists = _context.Items.Any(item => item.title == title);
+            bool exists = _context.Items.Any(item => item.id == id);
             if (exists)
             {
                 try
                 {
-                    Item item = new Item { title = title };
+                    Item item = new Item { id = id };
                     _context.Items.Attach(item);
                     _context.Items.Remove(item);
                     _context.SaveChanges();
@@ -192,14 +192,14 @@ namespace Prueba11.Controllers
             Item[] items;
             switch (orderBy)
             {
-                case "title":
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.title).ToArray();
+                case "id":
+                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
                     break;
                 case "rating":
                     items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.rating).ToArray();
                     break;
                 default:
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.title).ToArray();
+                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
                     break;
             }
             Console.WriteLine(items.Length + "items.Length");
@@ -226,11 +226,11 @@ namespace Prueba11.Controllers
                     data.Add("data", celebrities);
                     break;
                 case "topUserItems":
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.title).ToArray();
+                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
                     data.Add("data", items);
                     break;
                 default:
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.title).ToArray();
+                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
                     data.Add("data", items);
                     break;
             }
@@ -240,18 +240,18 @@ namespace Prueba11.Controllers
         }
 
         [HttpGet]
-        [Route("items/{title?}")]
-        public ActionResult GetItem(string title)
+        [Route("items/{id?}")]
+        public ActionResult GetItem(int id)
         {
             int status;
             string error = null;
-            bool exists = _context.Items.Any(item => item.title == title);
+            bool exists = _context.Items.Any(item => item.id == id);
             IDictionary<string, object> data = new Dictionary<string, object>();
             if (exists)
             {
                 try
                 {
-                    Item item = _context.Items.Where(item => item.title == title).FirstOrDefault();
+                    Item item = _context.Items.Where(item => item.id == id).FirstOrDefault();
                     data.Add("data", item);
                     status = HttpConstants.SUCCESS_DATA;
                 }
@@ -275,37 +275,195 @@ namespace Prueba11.Controllers
 
 
         [HttpPost]
-        [Route("items/link/celebrities/{title?}")]
-        public ActionResult LinkCelebritiesToItem([FromBody] LinkCelebritiesToItem input, string title) {
+        [Route("items/link/celebrities/{id?}")]
+        public async Task<IActionResult> LinkCelebritiesToItem([FromBody] LinkCelebritiesToItem input, int id)
+        {
+            int status = 500;
+            string error = null;
+            bool itemExists = _context.Items.Any(item => item.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (itemExists)
+            {
+                foreach (int idCelebrity in input.celebrityIds)
+                {
+                    bool existsLink = _context.LinkedItemWithCelebrities.Any(celebrityLink =>
+                        celebrityLink.celebrityId == idCelebrity && celebrityLink.itemId == id
+                    );
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (!existsLink)
+                    {
+                        try
+                        {
 
-            return Json("probando json");
+                            var item = new LinkedItemWithCelebrity()
+                            {
+                                celebrityId = idCelebrity,
+                                itemId = id
+                            };
+                            _context.LinkedItemWithCelebrities.Add(item);
+                            await _context.SaveChangesAsync();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
+        }
+
+
+        [HttpPost]
+        [Route("items/link/items/{id?}")]
+        public async Task<IActionResult> LinkItemsToItem([FromBody] LinkItemsToItem input, int id)
+        {
+            int status = 500;
+            string error = null;
+            bool exists = _context.Items.Any(item => item.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                foreach (int idItem in input.itemIds)
+                {
+                    bool existsLink = _context.LinkedItemWithItems.Any(itemLink =>
+                    (itemLink.itemId1 == idItem || itemLink.itemId2 == idItem) &&
+                    (itemLink.itemId1 == id || itemLink.itemId2 == id)
+                    );
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (!existsLink)
+                    {
+                        try
+                        {
+                            var itemWithItem = new LinkedItemWithItem()
+                            {
+                                itemId1 = id,
+                                itemId2 = idItem
+                            };
+                            _context.LinkedItemWithItems.Add(itemWithItem);
+                            await _context.SaveChangesAsync();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
 
 
         [HttpPost]
-        [Route("items/link/items/{title?}")]
-        public ActionResult LinkItemsToItem([FromBody] LinkItemsToItem input, string title) {
+        [Route("items/unlink/celebrity/{id?}")]
+        public ActionResult UnLinkCelebrityFromItem([FromBody] UnlinkCelebrityFromItem input, int id)
+        {
+            int status = 500;
+            string error = null;
+            bool exists = _context.Items.Any(item => item.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                foreach (int idCelebrity in input.celebrityIds)
+                {
 
-            return Json("probando json");
+                    LinkedItemWithCelebrity linkedItemWithCelebrity = _context.LinkedItemWithCelebrities.Where(celebrityItemLink =>
+                        celebrityItemLink.celebrityId == idCelebrity  && celebrityItemLink.itemId == id
+                    ).FirstOrDefault();
+                    Console.WriteLine(linkedItemWithCelebrity);
+                    Console.WriteLine(linkedItemWithCelebrity.celebrityId);
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (linkedItemWithCelebrity != null)
+                    {
+                        try
+                        {
+                            _context.LinkedItemWithCelebrities.Attach(linkedItemWithCelebrity);
+                            _context.LinkedItemWithCelebrities.Remove(linkedItemWithCelebrity);
+                            _context.SaveChanges();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
 
 
         [HttpPost]
-        [Route("items/unlink/celebrity/{title?}")]
-        public ActionResult UnLinkCelebrityFromItem([FromBody] UnlinkCelebrityFromItem input, string title) {
+        [Route("items/unlink/item/{id?}")]
+        public ActionResult UnLinkItemFromItem([FromBody] UnlinkItemFromItem input, int id)
+        {
+            int status = 500;
+            string error = null;
+            bool exists = _context.Items.Any(item => item.id == id);
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            if (exists)
+            {
+                foreach (int idItem in input.itemIds)
+                {
 
-            return Json("probando json");
-        }
-
-
-
-        [HttpPost]
-        [Route("items/unlink/item/{title?}")]
-        public ActionResult UnLinkItemFromItem([FromBody] UnlinkItemFromItem input, string title) {
-
-            return Json("probando json");
+                    LinkedItemWithItem linkedItemWithItem = _context.LinkedItemWithItems.Where(itemWithItemLink =>
+                        (itemWithItemLink.itemId1 == idItem || itemWithItemLink.itemId2 == idItem) &&
+                        (itemWithItemLink.itemId1 == id || itemWithItemLink.itemId2 == id)
+                    ).FirstOrDefault();
+                    status = HttpConstants.RESOURCE_CREATED;
+                    if (linkedItemWithItem != null)
+                    {
+                        try
+                        {
+                            _context.LinkedItemWithItems.Attach(linkedItemWithItem);
+                            _context.LinkedItemWithItems.Remove(linkedItemWithItem);
+                            _context.SaveChanges();
+                        }
+                        catch (IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            status = 500;
+                            error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                status = HttpConstants.NOT_FOUND;
+                error = "NO SE HA ENCONTRADO EL ITEM.";
+            }
+            data.Add("status", status);
+            data.Add("error", error);
+            return Json(data);
         }
 
 

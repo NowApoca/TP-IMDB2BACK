@@ -10,7 +10,8 @@ namespace Prueba11.Migrations
                 name: "Celebrities",
                 columns: table => new
                 {
-                    id = table.Column<string>(nullable: false),
+                    id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(nullable: true),
                     rating = table.Column<int>(nullable: false),
                     image = table.Column<string>(nullable: true),
@@ -59,8 +60,8 @@ namespace Prueba11.Migrations
                 name: "LinkedCelebrityWithCelebrities",
                 columns: table => new
                 {
-                    celebrityId1 = table.Column<string>(nullable: false),
-                    celebrityId2 = table.Column<string>(nullable: false)
+                    celebrityId1 = table.Column<int>(nullable: false),
+                    celebrityId2 = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,8 +72,8 @@ namespace Prueba11.Migrations
                 name: "LinkedItemWithCelebrities",
                 columns: table => new
                 {
-                    itemId = table.Column<string>(nullable: false),
-                    celebrityId = table.Column<string>(nullable: false)
+                    itemId = table.Column<int>(nullable: false),
+                    celebrityId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,8 +84,8 @@ namespace Prueba11.Migrations
                 name: "LinkedItemWithItems",
                 columns: table => new
                 {
-                    itemId1 = table.Column<string>(nullable: false),
-                    itemId2 = table.Column<string>(nullable: false)
+                    itemId1 = table.Column<int>(nullable: false),
+                    itemId2 = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,7 +97,7 @@ namespace Prueba11.Migrations
                 columns: table => new
                 {
                     userName = table.Column<string>(nullable: false),
-                    celebrityId = table.Column<string>(nullable: false),
+                    celebrityId = table.Column<int>(nullable: false),
                     rating = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -109,7 +110,7 @@ namespace Prueba11.Migrations
                 columns: table => new
                 {
                     userName = table.Column<string>(nullable: false),
-                    itemId = table.Column<string>(nullable: false),
+                    itemId = table.Column<int>(nullable: false),
                     rating = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -118,11 +119,55 @@ namespace Prueba11.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ReactionCommentCelebritys",
+                columns: table => new
+                {
+                    id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    commentCelebrityId = table.Column<int>(nullable: false),
+                    reactionType = table.Column<string>(nullable: true),
+                    userName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReactionCommentCelebritys", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReactionCommentItems",
+                columns: table => new
+                {
+                    id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    commentItemId = table.Column<int>(nullable: false),
+                    reactionType = table.Column<string>(nullable: true),
+                    userName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReactionCommentItems", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sessions",
+                columns: table => new
+                {
+                    token = table.Column<string>(nullable: false),
+                    expired = table.Column<bool>(nullable: false),
+                    userName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessions", x => x.token);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     userName = table.Column<string>(nullable: false),
                     password = table.Column<string>(nullable: true),
+                    isDeleted = table.Column<bool>(nullable: false),
                     role = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -131,12 +176,25 @@ namespace Prueba11.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserWatchlists",
+                columns: table => new
+                {
+                    itemId = table.Column<int>(nullable: false),
+                    userName = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserWatchlists", x => new { x.userName, x.itemId });
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CommentCelebrities",
                 columns: table => new
                 {
-                    id = table.Column<string>(nullable: false),
-                    ParentCommentCelebrityid = table.Column<string>(nullable: true),
-                    Celebrityid = table.Column<string>(nullable: true),
+                    id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ParentCommentCelebrityid = table.Column<int>(nullable: true),
+                    Celebrityid = table.Column<int>(nullable: true),
                     userName = table.Column<string>(nullable: true),
                     comment = table.Column<string>(nullable: true),
                     isDeleted = table.Column<bool>(nullable: false)
@@ -156,20 +214,15 @@ namespace Prueba11.Migrations
                         principalTable: "CommentCelebrities",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CommentCelebrities_Users_userName",
-                        column: x => x.userName,
-                        principalTable: "Users",
-                        principalColumn: "userName",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "CommentItems",
                 columns: table => new
                 {
-                    id = table.Column<string>(nullable: false),
-                    ParentCommentItemid = table.Column<string>(nullable: true),
+                    id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ParentCommentItemid = table.Column<int>(nullable: true),
                     Itemid = table.Column<int>(nullable: true),
                     userName = table.Column<string>(nullable: true),
                     comment = table.Column<string>(nullable: true),
@@ -190,84 +243,6 @@ namespace Prueba11.Migrations
                         principalTable: "CommentItems",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CommentItems_Users_userName",
-                        column: x => x.userName,
-                        principalTable: "Users",
-                        principalColumn: "userName",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Sessions",
-                columns: table => new
-                {
-                    token = table.Column<string>(nullable: false),
-                    expired = table.Column<bool>(nullable: false),
-                    userName = table.Column<string>(nullable: true),
-                    issuedAt = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Sessions", x => x.token);
-                    table.ForeignKey(
-                        name: "FK_Sessions_Users_userName",
-                        column: x => x.userName,
-                        principalTable: "Users",
-                        principalColumn: "userName",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReactionCommentCelebritys",
-                columns: table => new
-                {
-                    id = table.Column<string>(nullable: false),
-                    CommentCelebrityid = table.Column<string>(nullable: true),
-                    reactionType = table.Column<string>(nullable: true),
-                    userName = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReactionCommentCelebritys", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_ReactionCommentCelebritys_CommentCelebrities_CommentCelebrityid",
-                        column: x => x.CommentCelebrityid,
-                        principalTable: "CommentCelebrities",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ReactionCommentCelebritys_Users_userName",
-                        column: x => x.userName,
-                        principalTable: "Users",
-                        principalColumn: "userName",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReactionCommentItems",
-                columns: table => new
-                {
-                    id = table.Column<string>(nullable: false),
-                    CommentItemid = table.Column<string>(nullable: true),
-                    reactionType = table.Column<string>(nullable: true),
-                    userName = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReactionCommentItems", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_ReactionCommentItems_CommentItems_CommentItemid",
-                        column: x => x.CommentItemid,
-                        principalTable: "CommentItems",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ReactionCommentItems_Users_userName",
-                        column: x => x.userName,
-                        principalTable: "Users",
-                        principalColumn: "userName",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -281,11 +256,6 @@ namespace Prueba11.Migrations
                 column: "ParentCommentCelebrityid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CommentCelebrities_userName",
-                table: "CommentCelebrities",
-                column: "userName");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CommentItems_Itemid",
                 table: "CommentItems",
                 column: "Itemid");
@@ -294,40 +264,16 @@ namespace Prueba11.Migrations
                 name: "IX_CommentItems_ParentCommentItemid",
                 table: "CommentItems",
                 column: "ParentCommentItemid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CommentItems_userName",
-                table: "CommentItems",
-                column: "userName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReactionCommentCelebritys_CommentCelebrityid",
-                table: "ReactionCommentCelebritys",
-                column: "CommentCelebrityid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReactionCommentCelebritys_userName",
-                table: "ReactionCommentCelebritys",
-                column: "userName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReactionCommentItems_CommentItemid",
-                table: "ReactionCommentItems",
-                column: "CommentItemid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReactionCommentItems_userName",
-                table: "ReactionCommentItems",
-                column: "userName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sessions_userName",
-                table: "Sessions",
-                column: "userName");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "CommentCelebrities");
+
+            migrationBuilder.DropTable(
+                name: "CommentItems");
+
             migrationBuilder.DropTable(
                 name: "LinkedCelebrityWithCelebrities");
 
@@ -353,19 +299,16 @@ namespace Prueba11.Migrations
                 name: "Sessions");
 
             migrationBuilder.DropTable(
-                name: "CommentCelebrities");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "CommentItems");
+                name: "UserWatchlists");
 
             migrationBuilder.DropTable(
                 name: "Celebrities");
 
             migrationBuilder.DropTable(
                 name: "Items");
-
-            migrationBuilder.DropTable(
-                name: "Users");
         }
     }
 }

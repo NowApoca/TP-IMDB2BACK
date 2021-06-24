@@ -21,9 +21,10 @@ namespace Prueba11.Migrations
 
             modelBuilder.Entity("Prueba11.Models.Celebrity", b =>
                 {
-                    b.Property<string>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("biography")
                         .HasColumnType("nvarchar(max)");
@@ -59,15 +60,16 @@ namespace Prueba11.Migrations
 
             modelBuilder.Entity("Prueba11.Models.CommentCelebrity", b =>
                 {
-                    b.Property<string>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Celebrityid")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("Celebrityid")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ParentCommentCelebrityid")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("ParentCommentCelebrityid")
+                        .HasColumnType("int");
 
                     b.Property<string>("comment")
                         .HasColumnType("nvarchar(max)");
@@ -76,7 +78,7 @@ namespace Prueba11.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("userName")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
 
@@ -84,22 +86,21 @@ namespace Prueba11.Migrations
 
                     b.HasIndex("ParentCommentCelebrityid");
 
-                    b.HasIndex("userName");
-
                     b.ToTable("CommentCelebrities");
                 });
 
             modelBuilder.Entity("Prueba11.Models.CommentItem", b =>
                 {
-                    b.Property<string>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("Itemid")
                         .HasColumnType("int");
 
-                    b.Property<string>("ParentCommentItemid")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int?>("ParentCommentItemid")
+                        .HasColumnType("int");
 
                     b.Property<string>("comment")
                         .HasColumnType("nvarchar(max)");
@@ -108,15 +109,13 @@ namespace Prueba11.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("userName")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
 
                     b.HasIndex("Itemid");
 
                     b.HasIndex("ParentCommentItemid");
-
-                    b.HasIndex("userName");
 
                     b.ToTable("CommentItems");
                 });
@@ -186,11 +185,11 @@ namespace Prueba11.Migrations
 
             modelBuilder.Entity("Prueba11.Models.LinkedCelebrityWithCelebrity", b =>
                 {
-                    b.Property<string>("celebrityId1")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("celebrityId1")
+                        .HasColumnType("int");
 
-                    b.Property<string>("celebrityId2")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("celebrityId2")
+                        .HasColumnType("int");
 
                     b.HasKey("celebrityId1", "celebrityId2");
 
@@ -199,11 +198,11 @@ namespace Prueba11.Migrations
 
             modelBuilder.Entity("Prueba11.Models.LinkedItemWithCelebrity", b =>
                 {
-                    b.Property<string>("itemId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("itemId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("celebrityId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("celebrityId")
+                        .HasColumnType("int");
 
                     b.HasKey("itemId", "celebrityId");
 
@@ -212,11 +211,11 @@ namespace Prueba11.Migrations
 
             modelBuilder.Entity("Prueba11.Models.LinkedItemWithItem", b =>
                 {
-                    b.Property<string>("itemId1")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("itemId1")
+                        .HasColumnType("int");
 
-                    b.Property<string>("itemId2")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("itemId2")
+                        .HasColumnType("int");
 
                     b.HasKey("itemId1", "itemId2");
 
@@ -225,8 +224,8 @@ namespace Prueba11.Migrations
 
             modelBuilder.Entity("Prueba11.Models.RatingCelebrity", b =>
                 {
-                    b.Property<string>("celebrityId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("celebrityId")
+                        .HasColumnType("int");
 
                     b.Property<string>("userName")
                         .HasColumnType("nvarchar(450)");
@@ -244,8 +243,8 @@ namespace Prueba11.Migrations
                     b.Property<string>("userName")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("itemId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("itemId")
+                        .HasColumnType("int");
 
                     b.Property<int>("rating")
                         .HasColumnType("int");
@@ -257,48 +256,42 @@ namespace Prueba11.Migrations
 
             modelBuilder.Entity("Prueba11.Models.ReactionCommentCelebrity", b =>
                 {
-                    b.Property<string>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CommentCelebrityid")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("commentCelebrityId")
+                        .HasColumnType("int");
 
                     b.Property<string>("reactionType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("userName")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
-
-                    b.HasIndex("CommentCelebrityid");
-
-                    b.HasIndex("userName");
 
                     b.ToTable("ReactionCommentCelebritys");
                 });
 
             modelBuilder.Entity("Prueba11.Models.ReactionCommentItem", b =>
                 {
-                    b.Property<string>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CommentItemid")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("commentItemId")
+                        .HasColumnType("int");
 
                     b.Property<string>("reactionType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("userName")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
-
-                    b.HasIndex("CommentItemid");
-
-                    b.HasIndex("userName");
 
                     b.ToTable("ReactionCommentItems");
                 });
@@ -306,20 +299,16 @@ namespace Prueba11.Migrations
             modelBuilder.Entity("Prueba11.Models.Session", b =>
                 {
                     b.Property<string>("token")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("expired")
                         .HasColumnType("bit");
 
-                    b.Property<string>("issuedAt")
+                    b.Property<string>("userName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("userName")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("token");
-
-                    b.HasIndex("userName");
 
                     b.ToTable("Sessions");
                 });
@@ -328,6 +317,9 @@ namespace Prueba11.Migrations
                 {
                     b.Property<string>("userName")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("password")
                         .HasColumnType("nvarchar(max)");
@@ -340,6 +332,19 @@ namespace Prueba11.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Prueba11.Models.UserWatchlist", b =>
+                {
+                    b.Property<string>("userName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("itemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("userName", "itemId");
+
+                    b.ToTable("UserWatchlists");
+                });
+
             modelBuilder.Entity("Prueba11.Models.CommentCelebrity", b =>
                 {
                     b.HasOne("Prueba11.Models.Celebrity", "Celebrity")
@@ -349,10 +354,6 @@ namespace Prueba11.Migrations
                     b.HasOne("Prueba11.Models.CommentCelebrity", "ParentCommentCelebrity")
                         .WithMany()
                         .HasForeignKey("ParentCommentCelebrityid");
-
-                    b.HasOne("Prueba11.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("userName");
                 });
 
             modelBuilder.Entity("Prueba11.Models.CommentItem", b =>
@@ -364,39 +365,6 @@ namespace Prueba11.Migrations
                     b.HasOne("Prueba11.Models.CommentItem", "ParentCommentItem")
                         .WithMany()
                         .HasForeignKey("ParentCommentItemid");
-
-                    b.HasOne("Prueba11.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("userName");
-                });
-
-            modelBuilder.Entity("Prueba11.Models.ReactionCommentCelebrity", b =>
-                {
-                    b.HasOne("Prueba11.Models.CommentCelebrity", "CommentCelebrity")
-                        .WithMany()
-                        .HasForeignKey("CommentCelebrityid");
-
-                    b.HasOne("Prueba11.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("userName");
-                });
-
-            modelBuilder.Entity("Prueba11.Models.ReactionCommentItem", b =>
-                {
-                    b.HasOne("Prueba11.Models.CommentItem", "CommentItem")
-                        .WithMany()
-                        .HasForeignKey("CommentItemid");
-
-                    b.HasOne("Prueba11.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("userName");
-                });
-
-            modelBuilder.Entity("Prueba11.Models.Session", b =>
-                {
-                    b.HasOne("Prueba11.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("userName");
                 });
 #pragma warning restore 612, 618
         }

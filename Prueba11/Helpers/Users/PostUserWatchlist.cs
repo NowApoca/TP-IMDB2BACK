@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Prueba11.Helpers
 {
-    public class PatchEditComment
+    public class PostUserWatchlist
     {
-        public int comment {get; set;}
+        public int itemId {get; set;}
     }
 }

@@ -10,9 +10,9 @@ namespace Prueba11.Models
     public class Session
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string token {get; set;}
         public bool expired {get; set; }
-        public User User { get; set; }
-        public string issuedAt {get; set;}
+        public string userName { get; set; }
     }
 }

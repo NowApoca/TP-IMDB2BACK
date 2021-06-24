@@ -27,7 +27,9 @@ namespace Prueba11.Context
                 .HasKey(table => new { table.celebrityId, table.userName});
             modelBuilder.Entity<RatingItem>()
                 .HasKey(table => new { table.userName, table.itemId});
-            
+            modelBuilder.Entity<UserWatchlist>()
+                .HasKey(table => new { table.userName, table.itemId });
+
         }
         public DbSet<Celebrity> Celebrities { get; set; }
         public DbSet<CommentCelebrity> CommentCelebrities { get; set; }
@@ -42,5 +44,6 @@ namespace Prueba11.Context
         public DbSet<ReactionCommentCelebrity> ReactionCommentCelebritys { get; set; }
         public DbSet<Session> Sessions { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserWatchlist> UserWatchlists { get; set; }
     }
 }
