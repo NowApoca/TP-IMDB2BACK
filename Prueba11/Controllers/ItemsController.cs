@@ -22,28 +22,6 @@ namespace Prueba11.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        [Route("Value2/Index")]
-        public async Task<IActionResult> Items()
-        {
-            Item[] array1 = new Item[50];
-            Item newItem = new Item()
-            {
-                image = "./images/movie.jpg",
-                rating = 6
-            };
-            array1.Append(newItem);
-            array1.Append(newItem);
-            IDictionary<string, object> data = new Dictionary<string, object>();
-            data.Add("data", new[] {
-                newItem,
-                newItem
-            });
-            data.Add("status", 200);
-            data.Add("error", null);
-            return Json(data);
-        }
-
         [HttpPost]
         [Route("items")]
         public async Task<IActionResult> PostCreateItem([FromBody] PostCreateItem input)
@@ -142,6 +120,7 @@ namespace Prueba11.Controllers
             {
                 var item = new Item()
                 {
+                    id = id,
                     title = input.title,
                     image = input.image,
                     subtitle = input.subtitle,
@@ -197,6 +176,9 @@ namespace Prueba11.Controllers
                     break;
                 case "rating":
                     items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.rating).ToArray();
+                    break;
+                case "title":
+                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.title).ToArray();
                     break;
                 default:
                     items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();

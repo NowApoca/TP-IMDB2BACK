@@ -149,6 +149,24 @@ namespace Prueba11.Controllers
             data.Add("data", ratingItems);
             return Json(data);
         }
+
+        [HttpGet]
+        [Route("ratings/celebrities")]
+        public ActionResult GetUserRatingsCelebrities(GetFilters filters, [FromHeader] HeadersHelper headers)
+        {
+            Session session = _context.Sessions.Where(session => session.token == headers.Authorization).FirstOrDefault();
+            int limit = filters.limit;
+            int offset = filters.offset;
+            string orderBy = filters.orderBy;
+            RatingCelebrity[] ratingCelebrities;
+            ratingCelebrities = _context.RatingCelebrities.Where(ratingCelebrity => ratingCelebrity.userName == session.userName).Take(limit).Skip(offset).OrderBy(
+                rating => rating.rating
+            ).ToArray();
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("status", HttpConstants.SUCCESS_DATA);
+            data.Add("error", null);
+            data.Add("data", ratingCelebrities);
+            return Json(data);
+        }
     }
 }
-
