@@ -83,19 +83,30 @@ namespace Prueba11.Controllers
             bool exists = _context.Items.Any(item => item.id == id);
             if (exists)
             {
-                try
+
+                bool existsCelebrityRelations = _context.LinkedItemWithCelebrities.Any(item => item.itemId == id);
+                bool existsItemRelations = _context.LinkedItemWithItems.Any(item => item.itemId1 == id || item.itemId2 == id);
+                if (!existsCelebrityRelations && !existsItemRelations)
                 {
-                    Item item = new Item { id = id };
-                    _context.Items.Attach(item);
-                    _context.Items.Remove(item);
-                    _context.SaveChanges();
-                    status = HttpConstants.SUCCESS_NO_DATA;
+                    try
+                    {
+                        Item item = new Item { id = id };
+                        _context.Items.Attach(item);
+                        _context.Items.Remove(item);
+                        _context.SaveChanges();
+                        status = HttpConstants.SUCCESS_NO_DATA;
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.Message);
+                        status = 500;
+                        error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                    }
                 }
-                catch(IOException e)
+                else
                 {
-                    Console.WriteLine(e.Message);
-                    status = 500;
-                    error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                    status = HttpConstants.BAD_REQUEST;
+                    error = "EL ITEM AUN TIENE RELACIONES";
                 }
             }
             else

@@ -64,19 +64,29 @@ namespace Prueba11.Controllers
             bool exists = _context.Celebrities.Any(celebrity => celebrity.id == id);
             if (exists)
             {
-                try
+                bool existsItemRelations = _context.LinkedItemWithCelebrities.Any(item => item.celebrityId == id);
+                bool existsCelebrityRelations = _context.LinkedCelebrityWithCelebrities.Any(item => item.celebrityId1 == id || item.celebrityId2 == id);
+                if (!existsCelebrityRelations && !existsItemRelations)
                 {
-                    Celebrity celebrity = new Celebrity { id = id };
-                    _context.Celebrities.Attach(celebrity);
-                    _context.Celebrities.Remove(celebrity);
-                    _context.SaveChanges();
-                    status = HttpConstants.SUCCESS_NO_DATA;
+                    try
+                    {
+                        Celebrity celebrity = new Celebrity { id = id };
+                        _context.Celebrities.Attach(celebrity);
+                        _context.Celebrities.Remove(celebrity);
+                        _context.SaveChanges();
+                        status = HttpConstants.SUCCESS_NO_DATA;
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.Message);
+                        status = 500;
+                        error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                    }
                 }
-                catch(IOException e)
+                else
                 {
-                    Console.WriteLine(e.Message);
-                    status = 500;
-                    error = "ERROR INTERNO. VERIFIQUE LOGS.";
+                    status = HttpConstants.BAD_REQUEST;
+                    error = "LA CELEBRIDAD AUN TIENE RELACIONES";
                 }
             }
             else
@@ -143,6 +153,9 @@ namespace Prueba11.Controllers
             int offset = filters.offset;
             string orderBy = filters.orderBy;
             string filter = filters.filter;
+            Console.WriteLine("FILTER");
+            Console.WriteLine(filter);
+            Console.WriteLine("FILTER");
             Celebrity[] celebrities;
             switch (orderBy)
             {
