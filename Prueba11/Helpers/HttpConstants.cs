@@ -14,7 +14,7 @@ namespace Prueba11.Helpers
 {
     public class HttpConstants
     {
-        public static int SUCCESS_DATA = 201;
+        public static int SUCCESS_DATA = 200;
         public static int RESOURCE_CREATED = 201;
         public static int SUCCESS_NO_DATA = 204;
 

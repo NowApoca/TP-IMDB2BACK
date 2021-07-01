@@ -10,7 +10,7 @@ using Prueba11.Context;
 namespace Prueba11.Migrations
 {
     [DbContext(typeof(EscuelaDatabaseContext))]
-    [Migration("20210624160654_Prueba11.Context.EscuelaDatabaseContext")]
+    [Migration("20210626193317_Prueba11.Context.EscuelaDatabaseContext")]
     partial class Prueba11ContextEscuelaDatabaseContext
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

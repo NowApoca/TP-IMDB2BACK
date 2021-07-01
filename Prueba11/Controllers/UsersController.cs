@@ -75,7 +75,7 @@ namespace Prueba11.Controllers
                     userName = input.userName,
                     password = input.password,
                     isDeleted = false,
-                    role = input.role
+                    role = "ADMINISTRADOR"
                 };
                 try
                 {

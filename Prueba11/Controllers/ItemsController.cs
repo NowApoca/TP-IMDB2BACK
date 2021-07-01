@@ -164,58 +164,95 @@ namespace Prueba11.Controllers
 
         [HttpGet]
         [Route("items")]
-        public ActionResult GetItems([FromQuery] GetFilters filters) {
+        public ActionResult GetItems([FromQuery] GetFilters filters, [FromHeader] HeadersHelper headers) {
             int limit = filters.limit;
             int offset = filters.offset;
             string orderBy = filters.orderBy;
+            string filter = filters.filter;
             Item[] items;
             switch (orderBy)
             {
                 case "id":
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
-                    break;
-                case "rating":
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.rating).ToArray();
+                    if (filter == null)
+                    {
+                        items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
+                    }
+                    else
+                    {
+                        items = _context.Items.Take(limit).Skip(offset).Where(item => EF.Functions.Like(item.title, filter)).OrderBy(item => item.id).ToArray();
+                    }
                     break;
                 case "title":
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.title).ToArray();
+                    if (filter == null)
+                    {
+                        items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.title).ToArray();
+                    }
+                    else
+                    {
+                        items = _context.Items.Take(limit).Skip(offset).Where(item => EF.Functions.Like(item.title, filter)).OrderBy(item => item.title).ToArray();
+                    }
                     break;
                 default:
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
+                    if (filter == null)
+                    {
+                        items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
+                    }
+                    else
+                    {
+                        items = _context.Items.Take(limit).Skip(offset).Where(item => EF.Functions.Like(item.title, filter)).OrderBy(item => item.id).ToArray();
+                    }
                     break;
             }
-            Console.WriteLine(items.Length + "items.Length");
+            Session session;
             IDictionary<string, object> data = new Dictionary<string, object>();
-            data.Add("status", HttpConstants.SUCCESS_DATA);
-            data.Add("error", null);
-            data.Add("data", items);
-            return Json(data);
-        }
-
-        [HttpGet]
-        [Route("items/top/{topUserType?}")]
-        public ActionResult GetTopItems([FromQuery] GetFilters filters, string topUserType)
-        {
-            int limit = filters.limit;
-            int offset = filters.offset;
-            Item[] items;
-            Celebrity[] celebrities;
-            IDictionary<string, object> data = new Dictionary<string, object>();
-            switch (topUserType) 
+            RatingWithItem[] itemsGet = new RatingWithItem[limit];
+            int currentIndex = 0;
+            foreach (Item element in items)
             {
-                case "topUserCelebrities":
-                    celebrities = _context.Celebrities.Take(limit).Skip(offset).OrderBy(item => item.surname).ToArray();
-                    data.Add("data", celebrities);
-                    break;
-                case "topUserItems":
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
-                    data.Add("data", items);
-                    break;
-                default:
-                    items = _context.Items.Take(limit).Skip(offset).OrderBy(item => item.id).ToArray();
-                    data.Add("data", items);
-                    break;
+                RatingWithItem ratingWithRatingAndBookmark = new RatingWithItem()
+                {
+                    id = element.id,
+                    image = element.image,
+                    title = element.title,
+                    subtitle = element.subtitle
+                };
+
+                double totalRating = _context.RatingItems.Where(ratingItem => ratingItem.itemId == element.id).Sum(r => r.rating);
+                int totalRatingCount = _context.RatingItems.Where(ratingItem => ratingItem.itemId == element.id).Count();
+
+                if (totalRatingCount != 0)
+                {
+                    ratingWithRatingAndBookmark.rating = totalRating / totalRatingCount;
+                }
+                else
+                {
+                    ratingWithRatingAndBookmark.rating = 0;
+                }
+                if (headers.Authorization != null)
+                {
+                    session = _context.Sessions.Where(session => session.token == headers.Authorization).FirstOrDefault();
+                    if (session != null)
+                    {
+                        RatingItem rating = _context.RatingItems.Where(ratingItem => ratingItem.userName == session.userName && ratingItem.itemId == element.id).FirstOrDefault();
+                        UserWatchlist userWatchList = _context.UserWatchlists.Where(watchlist => watchlist.userName == session.userName && watchlist.itemId == element.id).FirstOrDefault();
+                        if (rating != null)
+                        {
+                            ratingWithRatingAndBookmark.userRating = rating.rating;
+                        }
+                        if (userWatchList != null)
+                        {
+                            ratingWithRatingAndBookmark.isBookmarked = true;
+                        }
+                        else
+                        {
+                            ratingWithRatingAndBookmark.isBookmarked = false;
+                        }
+                    }
+                }
+                itemsGet[currentIndex] = ratingWithRatingAndBookmark;
+                currentIndex++;
             }
+            data.Add("data", itemsGet);
             data.Add("status", HttpConstants.SUCCESS_DATA);
             data.Add("error", null);
             return Json(data);
@@ -223,7 +260,7 @@ namespace Prueba11.Controllers
 
         [HttpGet]
         [Route("items/{id?}")]
-        public ActionResult GetItem(int id)
+        public ActionResult GetItem(int id, [FromHeader] HeadersHelper headers)
         {
             int status;
             string error = null;
@@ -234,7 +271,33 @@ namespace Prueba11.Controllers
                 try
                 {
                     Item item = _context.Items.Where(item => item.id == id).FirstOrDefault();
-                    data.Add("data", item);
+
+                    double totalRating = _context.RatingItems.Where(ratingItem => ratingItem.itemId == id).Sum(r => r.rating);
+                    int totalRatingCount = _context.RatingItems.Where(ratingItem => ratingItem.itemId == id).Count();
+                    item.rating = totalRating / totalRatingCount;
+                    var castFromDB = _context.Celebrities.Join(
+                    _context.LinkedItemWithCelebrities,
+                    entryPoint => entryPoint.id,
+                    entry => entry.celebrityId,
+                    (entryPoint, entry) => new { celebrity = entryPoint, relation = entry }).Where(itemCele => itemCele.relation.itemId == id).ToArray();
+                    IDictionary<string, object> itemData = new Dictionary<string, object>();
+                    var relatedMovies = _context.Items.Join(
+                    _context.LinkedItemWithItems,
+                    entryPoint => entryPoint.id,
+                    entry => entry.itemId2,
+                    (entryPoint, entry) => new { item = entryPoint, relation = entry }).Where(item => item.relation.itemId1 == id || item.relation.itemId1 == id).ToArray();
+                    CommentItem[] comments = _context.CommentItems.Where(comment => comment.Item.id == id).ToArray();
+                    Session session = null;
+                    if (headers.Authorization != null)
+                    {
+                        session = _context.Sessions.Where(session => session.token == headers.Authorization).FirstOrDefault();
+                    }
+                    CommentWithReactions[] commentWithReactions = GetCommentsWithReactions.get(_context, comments, session);
+                    itemData.Add("data", item);
+                    itemData.Add("cast", castFromDB);
+                    itemData.Add("relatedMovies", relatedMovies);
+                    itemData.Add("comments", commentWithReactions);
+                    data.Add("data", itemData);
                     status = HttpConstants.SUCCESS_DATA;
                 }
                 catch (IOException e)
